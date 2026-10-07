@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>راح يجيبك عموره من؟</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Tahoma,Arial,sans-serif;background:linear-gradient(135deg,#8edcff,#eaf9ff);color:#172d52}
+.container{max-width:1050px;margin:auto;padding:18px}
+.hero{position:relative;overflow:hidden;background:#bfeaff;border:5px solid white;border-radius:38px;padding:28px 20px 20px;text-align:center;box-shadow:0 10px 35px #4687aa55}
+.hero:before,.hero:after{content:"★";position:absolute;font-size:45px;color:#ffc928}
+.hero:before{left:4%;top:10%}.hero:after{right:5%;bottom:8%}
+h1{margin:0;font-size:clamp(42px,8vw,82px);font-weight:900;color:#ff6ca8;text-shadow:5px 5px 0 white,-2px -2px 0 #142c50}
+.sub{font-size:clamp(22px,4vw,34px);font-weight:900;margin-top:8px}
+.intro{margin:15px auto 0;max-width:650px;font-size:18px;background:#ffffffbb;border-radius:18px;padding:10px}
+#quiz{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:18px 0}
+.card{background:#fff;border:4px solid #fff;border-radius:26px;padding:18px;box-shadow:0 7px 20px #427da544}
+.card:nth-child(3n+1){outline:3px solid #ffd55c}.card:nth-child(3n+2){outline:3px solid #ff9bc6}.card:nth-child(3n){outline:3px solid #65cfff}
+.q{font-size:20px;font-weight:900;margin-bottom:14px}
+.opt{display:block;width:100%;border:2px solid #b7d5f0;background:#f7fbff;border-radius:16px;padding:11px;margin:8px 0;font-size:17px;cursor:pointer;transition:.15s}
+.opt:hover{transform:translateY(-2px);background:#e9f7ff}
+.opt input{display:none}
+.opt.selected{background:#c9f6d5;border-color:#28a85d}
+button{border:0;border-radius:18px;padding:14px 22px;font-size:19px;font-weight:900;cursor:pointer}
+#finish{background:#1ca75a;color:#fff;box-shadow:0 5px 0 #147d43}
+#share{background:#ff6ca8;color:white}
+.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:10px 0 20px}
+#result{display:none;text-align:center;background:#fff;border-radius:28px;padding:25px;box-shadow:0 8px 24px #427da544;border:4px solid #ffd55c}
+.score{font-size:42px;font-weight:900;color:#159451}
+.footer{text-align:center;font-size:13px;opacity:.7;padding:12px}
+</style>
+</head>
+<body>
+<div class="container">
+<section class="hero">
+  <div style="font-size:50px">⭐ 💗 ☁️ 🐻</div>
+  <h1>راح يجيبك عموره</h1>
+  <div class="sub">من؟ 😏</div>
+  <div class="intro">اختبر أصحابك وشوف مين بعرف عموره أكثر! اختار إجابة واحدة لكل سؤال.</div>
+</section>
+
+<form id="quiz"></form>
+
+<div class="actions">
+  <button id="finish" type="button">شوف نتيجتي 🎯</button>
+  <button id="share" type="button">شارك الاختبار 🔗</button>
+</div>
+
+<section id="result">
+  <div style="font-size:52px">🎉</div>
+  <div class="score" id="score"></div>
+  <p id="message" style="font-size:20px;font-weight:700"></p>
+  <button id="retry" type="button" style="background:#65cfff;color:#17375f">إعادة الاختبار</button>
+</section>
+<div class="footer">صممه عموره 💙</div>
+</div>
+
+<script>
+const questions = [
+ {q:"ما أكثر لون يحبه عمر؟", a:["أسود","أخضر غامق","أصفر فاتح","أحمر"], correct:1},
+ {q:"ما أكثر حيوان يحبه عمر؟", a:["الأرانب","الجاج","القطط","الكلاب"], correct:0},
+ {q:"ما أكثر جو يحبه عمر؟", a:["مثنى ودخان","تعاليل مع عمامي","الناجي","قعدة دار فوفو"], correct:0},
+ {q:"أكثر أكلة يحبها عمر؟", a:["منسف","مقلوبة","كبسة","فتة"], correct:3},
+ {q:"ما أكثر مادة يحبها عمر؟", a:["التاريخ","العربي","الإنجليزي","الدين"], correct:3},
+ {q:"ما أكثر يوم يحبه عمر؟", a:["الثلاثاء","الخميس","السبت"], correct:1},
+ {q:"ما أكثر فصل يحبه عمر؟", a:["الصيف","الربيع","الشتاء","الخريف"], correct:2}
+];
+
+const quiz=document.getElementById("quiz");
+questions.forEach((x,i)=>{
+ const card=document.createElement("div"); card.className="card";
+ card.innerHTML=`<div class="q">${i+1}. ${x.q}</div>`+
+ x.a.map((v,j)=>`<label class="opt"><input type="radio" name="q${i}" value="${j}"><span>${v}</span></label>`).join("");
+ quiz.appendChild(card);
+});
+quiz.addEventListener("change",e=>{
+ if(e.target.type==="radio"){
+  document.querySelectorAll(`input[name="${e.target.name}"]`).forEach(r=>r.parentElement.classList.remove("selected"));
+  e.target.parentElement.classList.add("selected");
+ }
+});
+document.getElementById("finish").onclick=()=>{
+ let score=0, answered=0;
+ questions.forEach((x,i)=>{
+  const r=document.querySelector(`input[name="q${i}"]:checked`);
+  if(r){answered++; if(+r.value===x.correct)score++;}
+ });
+ if(answered<questions.length){alert("جاوب على كل الأسئلة أولاً 😄");return;}
+ document.getElementById("score").textContent=`${score} / ${questions.length}`;
+ const msg=score===7?"أسطورة! بتعرف عموره من قلب ❤️":score>=5?"ممتاز! واضح إنك قريب من عموره 😎":score>=3?"منيح! بدك تعرف عموره أكثر 😂":"لازم تقعد مع عموره أكثر 😂";
+ document.getElementById("message").textContent=msg;
+ document.getElementById("result").style.display="block";
+ document.getElementById("result").scrollIntoView({behavior:"smooth"});
+};
+document.getElementById("retry").onclick=()=>location.reload();
+document.getElementById("share").onclick=async()=>{
+ const url=location.href;
+ try{
+  if(navigator.share){await navigator.share({title:"راح يجيبك عموره من؟",text:"اختبر حالك: مين بعرف عموره أكثر؟",url});}
+  else{await navigator.clipboard.writeText(url);alert("تم نسخ رابط الصفحة!");}
+ }catch(e){}
+};
+</script>
+</body>
+</html>
